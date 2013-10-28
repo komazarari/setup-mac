@@ -36,9 +36,20 @@ dmg_package 'Google Chrome' do
   action   :install
 end
 
+dmg_package "Emacs" do
+  source 'http://emacsformacosx.com/emacs-builds/Emacs-24.3-universal-10.6.8.dmg'
+  action :install
+end
+
+dmg_package "VirtualBox" do
+  source 'http://download.virtualbox.org/virtualbox/4.3.0/VirtualBox-4.3.0-89960-OSX.dmg'
+  checksum "0a6391b00d5c842c492319e5e2e213bf03bd91f4c66fde34ad874236bef9f615"
+  type "pkg"
+  action :install
+end
+
 {
-  "http://iterm2.com/downloads/stable/iterm2_v1_0_0.zip" => "iTerm",
-  "http://i.agilebits.com/dist/1P/mac4/1Password-4.0.2.zip" => "1Password 4",
+  "http://iterm2.com/downloads/stable/iTerm2_v1_0_0.zip" => "iTerm",
   "http://cachefly.alfredapp.com/Alfred_2.0.9_214.zip" => "Alfred 2",
 }.each_pair do |url, name|
   unless File.exist?("/Applications/#{name}.app")
@@ -58,26 +69,15 @@ end
   end
 end
 
-user username do
-  action :modify
-  shell '/bin/zsh'
-end
-
-execute "dotfiles/setup.sh" do
-  command File.expand_path(".dotfiles/setup.sh", userdata['dir'])
+execute "dots/setup.sh" do
+  command File.expand_path(".dots/setup.sh", userdata['dir'])
   user username
   action :nothing
 end
 
-git File.expand_path(".dotfiles", userdata['dir']) do
-  repository "git@github.com:ryotarai/dotfiles.git"
-  notifies :run, "execute[dotfiles/setup.sh]"
+git File.expand_path(".dots", userdata['dir']) do
+  repository "git@github.com:komazarari/dots.git"
+  notifies :run, "execute[dots/setup.sh]"
   user username
 end
-
-git File.expand_path(".oh-my-zsh", userdata['dir']) do
-  repository "git://github.com/robbyrussell/oh-my-zsh.git"
-  user username
-end
-
 
